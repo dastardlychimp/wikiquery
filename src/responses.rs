@@ -75,7 +75,7 @@ pub mod category_members
         pub sort_key: Option<String>,
         #[serde(rename="sortkeyprefix")]
         pub sort_key_prefix: Option<String>,
-        pub title: String,
+        pub title: Option<String>,
         #[serde(rename="type")]
         pub page_type: Option<String>,
         pub timestamp: Option<String>,

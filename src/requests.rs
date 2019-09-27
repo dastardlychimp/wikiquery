@@ -18,8 +18,6 @@ use crate::responses;
 
 pub type Params<'a> = HashMap<&'a str, String>;
 
-pub const ADDRESS: &'static str = "https://en.wikipedia.org/w/api.php";
-
 /// A builder to generate mediawiki queries.
 /// 
 pub struct Query<'a>
@@ -462,10 +460,6 @@ mod test
                 .cm_title("Lists_of_colors")
                 .cm_type("page");
         }
-
-        let request = query.build().unwrap();
-
-        let (parts, _body) = request.into_parts();
 
         let contains = [
             "list=allcategories|categorymembers",
