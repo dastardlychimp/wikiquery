@@ -3,10 +3,13 @@
 //! Current implementations include:
 //! - [`AllCategoriesQuery`]
 //! - [`CategoryMembersQuery`]
+//! // PagesQuery is only partially implemented.
+//! - [`PagesQuery`]
 //! 
 //! Find documentation for the different queries at [`mediawiki`].
 //! 
 //! [`mediawiki`]: https://www.mediawiki.org/wiki/API:Query
+//! [`PagesQuery`]: pages/struct.PagesQuery.html
 //! [`AllCategoriesQuery`]: struct.AllCategoriesQuery.html
 //! [`CategoryMembersQuery`]: struct.CategoryMembersQuery.html
 
@@ -16,11 +19,13 @@ use std::collections::HashMap;
 
 use crate::responses;
 
-mod all_categories;
-mod category_members;
+pub mod all_categories;
+pub mod category_members;
+pub mod pages;
 
 use all_categories::AllCategoriesQuery;
 use category_members::CategoryMembersQuery;
+use pages::PagesQuery;
 
 pub type Params<'a> = HashMap<&'a str, String>;
 
@@ -68,6 +73,14 @@ impl<'a, 'b> Query<'a>
     pub fn category_members(&'b mut self) -> CategoryMembersQuery<'a, 'b>
     {
         CategoryMembersQuery::new(&mut self.params)
+    }
+
+    /// Creates a new pages query
+    /// 
+    /// Gets information on specific pages.
+    pub fn pages(&'b mut self) -> PagesQuery<'a, 'b>
+    {
+        PagesQuery::new(&mut self.params)
     }
 
     /// Add the format param to the query
@@ -158,12 +171,13 @@ impl<'a, 'b> Query<'a>
     /// 
     /// # let resp = QueryResponse {
     /// #     batch_complete: true,
-    /// #     query: QueryBlock {all_categories: None, category_members: None},
+    /// #     query: QueryBlock {all_categories: None, category_members: None, pages: None},
     /// #     warnings: None,
     /// #     continue_block: Some(ContinueBlock {
     /// #         r#continue: String::new(),
     /// #         ac_continue: Some("Archives".to_string()),
-    /// #         cm_continue: None
+    /// #         cm_continue: None,
+    /// #         in_continue: None,
     /// #     })
     /// # };
     /// 
@@ -186,6 +200,11 @@ impl<'a, 'b> Query<'a>
             if let Some(cont) = &continue_block.cm_continue
             {
                 self.params.insert("cmcontinue", cont.to_string());
+            }
+
+            if let Some(cont) = &continue_block.in_continue
+            {
+                self.params.insert("incontinue", cont.to_string());
             }
 
         }
@@ -231,7 +250,7 @@ macro_rules! impl_sub_query
 
 impl_sub_query!(CategoryMembersQuery);
 impl_sub_query!(AllCategoriesQuery);
-
+impl_sub_query!(PagesQuery);
 
 #[cfg(test)]
 mod test
@@ -278,11 +297,18 @@ mod test
             r#continue: "-||".to_string(),
             ac_continue: Some("a".to_string()),
             cm_continue: Some("b".to_string()),
+            in_continue: Some("c".to_string()),
         };
 
         query.continue_query(&Some(continue_block));
 
-        let contains = ["continue=-||", "accontinue=a", "cmcontinue=b"];
+        let contains = [
+            "continue=-||",
+            "accontinue=a",
+            "cmcontinue=b",
+            "incontinue=c"
+        ];
+
         assert_query_contains(&mut query, &contains);
     }
 }

@@ -1,4 +1,4 @@
-use super::{Params, Query, SubQuery};
+use super::{Params, SubQuery};
 
 /// Generates an *allcategories* list query.
 /// 

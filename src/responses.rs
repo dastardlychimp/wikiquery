@@ -1,6 +1,8 @@
 use serde;
 use serde::{Deserialize};
 
+use std::collections::HashMap;
+
 #[derive(Debug, Deserialize)]
 pub struct ContinueBlock
 {
@@ -8,12 +10,15 @@ pub struct ContinueBlock
     #[serde(rename="accontinue")]
     pub ac_continue: Option<String>,
     #[serde(rename="cmcontinue")]
-    pub cm_continue: Option<String>
+    pub cm_continue: Option<String>,
+    #[serde(rename="incontinue")]
+    pub in_continue: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct QueryBlock
 {
+    pub pages: Option<Vec<pages::Data>>,
     #[serde(rename="allcategories")]
     pub all_categories: Option<Vec<all_categories::Data>>,
     #[serde(rename="categorymembers")]
@@ -24,9 +29,11 @@ pub struct QueryBlock
 pub struct WarningBlock
 {
     #[serde(rename="allcategories")]
-    pub all_categories: Option<all_categories::Warnings>,
+    pub all_categories: Option<Warnings>,
     #[serde(rename="categorymembers")]
-    pub category_members: Option<all_categories::Warnings>
+    pub category_members: Option<Warnings>,
+    pub info: Option<Warnings>,
+    pub pages: Option<Warnings>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -38,6 +45,13 @@ pub struct Query
     #[serde(rename = "continue")]
     pub continue_block: Option<ContinueBlock>,
     pub warnings: Option<WarningBlock>
+}
+
+
+#[derive(Debug, Deserialize)]
+pub struct Warnings
+{
+    pub warnings: String,
 }
 
 pub mod all_categories
@@ -52,12 +66,6 @@ pub mod all_categories
         pub pages: Option<u32>,
         pub files: Option<u32>,
         pub subcats: Option<u32>,
-    }
-
-    #[derive(Debug, Deserialize)]
-    pub struct Warnings
-    {
-        pub warnings: String,
     }
 }
 
@@ -80,11 +88,77 @@ pub mod category_members
         pub page_type: Option<String>,
         pub timestamp: Option<String>,
     }
+}
+
+pub mod pages
+{
+    use super::*;
 
     #[derive(Debug, Deserialize)]
-    pub struct Warnings
+    pub struct Data
     {
-        pub warnings: String,
+        // Default data
+        pub ns: u32,
+        pub title: String,
+        pub missing: Option<String>,
+        #[serde(rename="pageid")]
+        pub page_id: u64,
+
+        // Data from the info prop
+        #[serde(rename="contentmodel")]
+        pub content_model: Option<String>,
+        #[serde(rename="pagelanguage")]
+        pub page_language: Option<String>,
+        #[serde(rename="pagelanguagehtmlcode")]
+        pub page_language_html_code: Option<String>,
+        #[serde(rename="pagelanguagedir")]
+        pub page_language_dir: Option<String>,
+        pub touched: Option<String>,
+        #[serde(rename="lastrevid")]
+        pub last_rev_id: Option<u32>,
+        pub length: Option<u32>,
+        pub protection: Option<Vec<info::Protection>>,
+        #[serde(rename="restrictiontypes")]
+        pub restriction_types: Option<Vec<String>>,
+        #[serde(rename="fullurl")]
+        pub full_url: Option<String>,
+        #[serde(rename="editurl")]
+        pub edit_url: Option<String>,
+        #[serde(rename="canonicalurl")]
+        pub canonical_url: Option<String>,
+        #[serde(rename="displaytitle")]
+        pub display_title: Option<String>,
+        pub actions: Option<HashMap<String, Vec<info::Actions>>>,
+        
+    }
+
+    pub mod info
+    {
+        use super::*;
+        
+        #[derive(Debug, Deserialize)]
+        #[serde(untagged)]
+        pub enum Actions
+        {
+            Bool(bool),
+            Detailed(DetailedActions),
+        }
+
+        #[derive(Debug, Deserialize)]
+        pub struct DetailedActions
+        {
+            code: String,
+            text: String,
+        }
+
+        #[derive(Debug, Deserialize)]
+        pub struct Protection
+        {
+            #[serde(rename="type")]
+            protection_type: String,
+            level: String,
+            expiry: String,
+        }
     }
 }
 
