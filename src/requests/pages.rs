@@ -91,6 +91,46 @@ impl<'a, 'b> PagesQuery<'a, 'b>
         self.add_param_value("incontinue", value.into())
     }
 
+
+    /*
+        -----
+        Description Query methods
+        -----
+    */
+
+    /// Adds the description prop
+    /// 
+    /// Param documentatin can be found at [`mediawiki:Description`]
+    /// 
+    /// # Examples
+    /// ```
+    /// use wikiquery::requests::Query;
+    /// 
+    /// let mut query = Query::new();
+    /// 
+    /// query.pages()
+    ///     .titles("United%20States")
+    ///     .description();
+    /// 
+    /// let request = query.build().unwrap();
+    /// ```
+    /// 
+    /// [`mediawiki:Description`]: https://www.mediawiki.org/wiki/API:Description
+    pub fn description(&'b mut self) -> &mut Self
+    {
+        self.add_param_value("prop", "description".to_string())
+    }
+
+    pub fn desc_continue<S: Into<String>>(&'b mut self, value: S) -> &mut Self
+    {
+        self.add_param_value("desccontinue", value.into())
+    }
+    
+    pub fn desc_prefer_source<S: Into<String>>(&mut self, value: S) -> &mut Self
+    {
+        self.add_param_value("descprefersource", value.into())
+    }
+
 }
 
 
@@ -117,6 +157,26 @@ mod pages_tests
             "inprop=2",
             "intestactionsdetail=3",
             "incontinue=4",
+        ];
+
+        assert_query_contains(&mut query, &contains);
+    }
+
+    #[test]
+    fn description_all_fields() {
+        let mut query = Query::new();
+
+        query.pages()
+            .titles("1")
+            .description()
+            .desc_prefer_source("1")
+            .desc_continue("2");
+
+        let contains = [
+            "titles=1",
+            "prop=description",
+            "descprefersource=1",
+            "desccontinue=2"
         ];
 
         assert_query_contains(&mut query, &contains);

@@ -178,6 +178,7 @@ impl<'a, 'b> Query<'a>
     /// #         ac_continue: Some("Archives".to_string()),
     /// #         cm_continue: None,
     /// #         in_continue: None,
+    /// #         desc_continue: None,
     /// #     })
     /// # };
     /// 
@@ -205,6 +206,11 @@ impl<'a, 'b> Query<'a>
             if let Some(cont) = &continue_block.in_continue
             {
                 self.params.insert("incontinue", cont.to_string());
+            }
+
+            if let Some(cont) = &continue_block.desc_continue
+            {
+                self.params.insert("desccontinue", cont.to_string());
             }
 
         }
@@ -298,6 +304,7 @@ mod test
             ac_continue: Some("a".to_string()),
             cm_continue: Some("b".to_string()),
             in_continue: Some("c".to_string()),
+            desc_continue: Some("d".to_string()),
         };
 
         query.continue_query(&Some(continue_block));
@@ -306,7 +313,8 @@ mod test
             "continue=-||",
             "accontinue=a",
             "cmcontinue=b",
-            "incontinue=c"
+            "incontinue=c",
+            "desccontinue=d",
         ];
 
         assert_query_contains(&mut query, &contains);

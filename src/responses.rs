@@ -13,6 +13,8 @@ pub struct ContinueBlock
     pub cm_continue: Option<String>,
     #[serde(rename="incontinue")]
     pub in_continue: Option<String>,
+    #[serde(rename="desccontinue")]
+    pub desc_continue: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -100,11 +102,20 @@ pub mod pages
         // Default data
         pub ns: u32,
         pub title: String,
-        pub missing: Option<String>,
+        pub missing: Option<bool>,
         #[serde(rename="pageid")]
         pub page_id: u64,
 
+        // -----
+        // Data from the description prop
+        // -----
+        pub description: Option<String>,
+        #[serde(rename="descriptionsource")]
+        pub description_source: Option<String>,
+
+        // -----
         // Data from the info prop
+        // -----
         #[serde(rename="contentmodel")]
         pub content_model: Option<String>,
         #[serde(rename="pagelanguage")]
@@ -129,7 +140,6 @@ pub mod pages
         #[serde(rename="displaytitle")]
         pub display_title: Option<String>,
         pub actions: Option<HashMap<String, Vec<info::Actions>>>,
-        
     }
 
     pub mod info

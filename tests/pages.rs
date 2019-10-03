@@ -72,4 +72,31 @@ mod pages_tests
         assert!(first_page.display_title.is_some());
         assert!(first_page.actions.is_some());
     }
+
+    #[test]
+    fn all_description_test() {
+        let mut query = Query::new();
+
+        query.pages()
+            .titles("Death")
+            .description()
+            .desc_prefer_source("central");
+
+        let uri = query.uri().unwrap();
+
+        let response = send_successful_query(uri);
+
+        println!("{:?}", &response);
+
+        let pages = response.query.pages.unwrap();
+        let first_page = &pages[0];
+
+        assert_eq!(first_page.ns, 0);
+        assert_eq!(first_page.page_id, 8221);
+        assert_eq!(first_page.title, "Death".to_string());
+        assert!(first_page.missing.is_none());
+
+        assert_eq!(first_page.description, Some("permanent cessation of vital functions".to_string()));
+        assert_eq!(first_page.description_source, Some("central".to_string()));
+    }
 }
