@@ -15,6 +15,8 @@ pub struct ContinueBlock
     pub in_continue: Option<String>,
     #[serde(rename="desccontinue")]
     pub desc_continue: Option<String>,
+    #[serde(rename="excontinue")]
+    pub ex_continue: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -36,6 +38,8 @@ pub struct WarningBlock
     pub category_members: Option<Warnings>,
     pub info: Option<Warnings>,
     pub pages: Option<Warnings>,
+    pub description: Option<Warnings>,
+    pub extracts: Option<Warnings>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -46,7 +50,7 @@ pub struct Query
     pub query: QueryBlock,
     #[serde(rename = "continue")]
     pub continue_block: Option<ContinueBlock>,
-    pub warnings: Option<WarningBlock>
+    pub warnings: Option<WarningBlock>,
 }
 
 
@@ -112,6 +116,11 @@ pub mod pages
         pub description: Option<String>,
         #[serde(rename="descriptionsource")]
         pub description_source: Option<String>,
+
+        // -----
+        // Data from the extracts prop
+        // -----
+        pub extract: Option<String>,
 
         // -----
         // Data from the info prop

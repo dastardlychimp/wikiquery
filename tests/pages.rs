@@ -88,6 +88,8 @@ mod pages_tests
 
         println!("{:?}", &response);
 
+        assert!(response.warnings.is_none());
+
         let pages = response.query.pages.unwrap();
         let first_page = &pages[0];
 
@@ -98,5 +100,36 @@ mod pages_tests
 
         assert_eq!(first_page.description, Some("permanent cessation of vital functions".to_string()));
         assert_eq!(first_page.description_source, Some("central".to_string()));
+    }
+
+
+    #[test]
+    fn extracts_chars_test() {
+        let mut query = Query::new();
+
+        query.pages()
+            .titles("Death")
+            .extracts()
+            .ex_chars("50")
+            .ex_limit("1")
+            .ex_plain_text();
+
+        let uri = query.uri().unwrap();
+
+        let response = send_successful_query(uri);
+        
+        println!("{:?}", &response);
+
+        assert!(response.warnings.is_none());
+
+        let pages = response.query.pages.unwrap();
+        let first_page = &pages[0];
+
+        assert_eq!(first_page.ns, 0);
+        assert_eq!(first_page.page_id, 8221);
+        assert_eq!(first_page.title, "Death".to_string());
+        assert!(first_page.missing.is_none());
+
+        assert_eq!(first_page.extract, Some("Death is the permanent cessation of all biological...".to_string()))
     }
 }

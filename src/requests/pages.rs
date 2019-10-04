@@ -9,8 +9,12 @@ use super::{Params, SubQuery};
 /// the pages. Then call prop methods.
 /// 
 /// ## Prop methods
+/// - [`PagesQuery::description`]
+/// - [`PagesQuery::extracts]
 /// - [`PagesQuery::info`]
 /// 
+/// [`PagesQuery::description`]: PagesQuery::description
+/// [`PagesQuery::extracts`]: PagesQuery::extracts
 /// [`PagesQuery::info`]: PagesQuery::info
 /// [`PagesQuery::titles`]: PagesQuery::titles
 /// [`mediawiki:Api`]: https://www.mediawiki.org/wiki/API
@@ -43,7 +47,7 @@ impl<'a, 'b> PagesQuery<'a, 'b>
 
     /// Adds the info prop
     /// 
-    /// Param documentatin can be found at [`mediawiki:Info`]
+    /// Param documentation can be found at [`mediawiki:Info`]
     /// 
     /// # Examples
     /// ```
@@ -100,7 +104,7 @@ impl<'a, 'b> PagesQuery<'a, 'b>
 
     /// Adds the description prop
     /// 
-    /// Param documentatin can be found at [`mediawiki:Description`]
+    /// Param documentation can be found at [`mediawiki:Description`]
     /// 
     /// # Examples
     /// ```
@@ -131,6 +135,71 @@ impl<'a, 'b> PagesQuery<'a, 'b>
         self.add_param_value("descprefersource", value.into())
     }
 
+    /*
+        -----
+        Extracts Query methods
+        -----
+    */
+
+    /// Adds the extraction prop
+    /// 
+    /// Param documentation can be found at [`mediawiki:Extracts`]
+    /// 
+    /// # Examples
+    /// ```
+    /// use wikiquery::requests::Query;
+    /// 
+    /// let mut query = Query::new();
+    /// 
+    /// query.pages()
+    ///     .titles("United%20States")
+    ///     .extracts()
+    ///     .ex_chars("100")
+    ///     .ex_plain_text();
+    /// 
+    /// let request = query.build().unwrap();
+    /// ```
+    /// 
+    /// [`mediawiki:Extracts`]: https://www.mediawiki.org/wiki/Extension:TextExtracts#API
+    pub fn extracts(&'b mut self) -> &mut Self
+    {
+        self.add_param_value("prop", "extracts".to_string())
+    }
+
+    pub fn ex_chars<S: Into<String>>(&mut self, value: S) -> &mut Self
+    {
+        self.add_param_value("exchars", value.into())
+    }
+
+    pub fn ex_sentences<S: Into<String>>(&mut self, value: S) -> &mut Self
+    {
+        self.add_param_value("exsentences", value.into())
+    }
+
+    pub fn ex_limit<S: Into<String>>(&mut self, value: S) -> &mut Self
+    {
+        self.add_param_value("exlimit", value.into())
+    }
+
+    pub fn ex_intro(&mut self) -> &mut Self
+    {
+        self.add_param_value("exintro", "true".to_string())
+    }
+
+    pub fn ex_plain_text(&mut self) -> &mut Self
+    {
+        self.add_param_value("explaintext", "true".to_string())
+    }
+
+    pub fn ex_section_format<S: Into<String>>(&mut self, value: S) -> &mut Self
+    {
+        self.add_param_value("exsectionformat", value.into())
+    }
+
+    pub fn ex_continue<S: Into<String>>(&mut self, value: S) -> &mut Self
+    {
+        self.add_param_value("excontinue", value.into())
+    }
 }
 
 
@@ -177,6 +246,36 @@ mod pages_tests
             "prop=description",
             "descprefersource=1",
             "desccontinue=2"
+        ];
+
+        assert_query_contains(&mut query, &contains);
+    }
+
+    #[test]
+    fn extracts_all_fields() {
+        let mut query = Query::new();
+
+        query.pages()
+            .titles("1")
+            .extracts()
+            .ex_chars("2")
+            .ex_sentences("3")
+            .ex_limit("4")
+            .ex_intro()
+            .ex_plain_text()
+            .ex_section_format("7")
+            .ex_continue("8");
+
+        let contains = [
+            "titles=1",
+            "prop=extracts",
+            "exchars=2",
+            "exsentences=3",
+            "exlimit=4",
+            "exintro=true",
+            "explaintext=true",
+            "exsectionformat=7",
+            "excontinue=8",
         ];
 
         assert_query_contains(&mut query, &contains);

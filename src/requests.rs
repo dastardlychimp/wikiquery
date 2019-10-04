@@ -179,6 +179,7 @@ impl<'a, 'b> Query<'a>
     /// #         cm_continue: None,
     /// #         in_continue: None,
     /// #         desc_continue: None,
+    /// #         ex_continue: None,
     /// #     })
     /// # };
     /// 
@@ -211,6 +212,11 @@ impl<'a, 'b> Query<'a>
             if let Some(cont) = &continue_block.desc_continue
             {
                 self.params.insert("desccontinue", cont.to_string());
+            }
+
+            if let Some(cont) = &continue_block.ex_continue
+            {
+                self.params.insert("excontinue", cont.to_string());
             }
 
         }
@@ -305,6 +311,7 @@ mod test
             cm_continue: Some("b".to_string()),
             in_continue: Some("c".to_string()),
             desc_continue: Some("d".to_string()),
+            ex_continue: Some("e".to_string()),
         };
 
         query.continue_query(&Some(continue_block));
@@ -315,6 +322,7 @@ mod test
             "cmcontinue=b",
             "incontinue=c",
             "desccontinue=d",
+            "excontinue=e",
         ];
 
         assert_query_contains(&mut query, &contains);
